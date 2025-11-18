@@ -7,6 +7,7 @@ import os
 import re
 import time
 import zipfile
+import subprocess
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from typing import List, Tuple, Optional
@@ -20,6 +21,17 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+
+def close_chrome_processes():
+    """Close all Chrome processes"""
+    try:
+        print("Closing any running Chrome processes...")
+        subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"], 
+                      capture_output=True, check=False)
+        time.sleep(2)
+    except Exception as e:
+        pass
 
 
 # ===================================================
@@ -76,7 +88,7 @@ def load_transcript(path: str) -> str:
 
 # This is the exact 1-to-1 mapping provided by the user
 SEGMENT_TO_TRANSCRIPT_MAP = {
-    # AUGUST
+    # AUGUST - TESTING WITH ONE MONTH ONLY
     "Konkani Prime News_070817": "7 AUG PRIME_non_bold.odt",
     "Konkani Prime News_100817": "10  AUG PRIME_non_bold.odt",
     "Konkani Prime News_150817": "15 AUG PRIME_non_bold.odt",
@@ -86,55 +98,55 @@ SEGMENT_TO_TRANSCRIPT_MAP = {
     "Konkani Prime News_270817": "27 AUG PRIME_non_bold.odt",
     "Konkani Prime News_310817": "31  AUG PRIME_non_bold.odt",
     
-    # JULY
-    "konkani Prime news_030717": "3 JULY PRIME_non_bold.odt",
-    "Konkani Prime news_040717": "4 JULY PRIME_non_bold.odt",
-    "Konkani Prime news_060717": "6  JULY PRIME_non_bold.odt",
-    "Konkani Prime news_100717": "10JULYPRIME_non_bold.odt",
-    "Konkani Prime news_170717": "17 JULY PRIME_non_bold.odt",
-    "Konkani Update news_170717": "17 JULY UPDATE_non_bold.odt",
-    "Konkani Prime news_250717": "25 JULY PRIME_non_bold.odt",
-    "Konkani Prime news_270717": "27 JULY PRIME_non_bold.odt",
+    # JULY - COMMENTED OUT FOR TESTING
+    # "konkani Prime news_030717": "3 JULY PRIME_non_bold.odt",
+    # "Konkani Prime news_040717": "4 JULY PRIME_non_bold.odt",
+    # "Konkani Prime news_060717": "6  JULY PRIME_non_bold.odt",
+    # "Konkani Prime news_100717": "10JULYPRIME_non_bold.odt",
+    # "Konkani Prime news_170717": "17 JULY PRIME_non_bold.odt",
+    # "Konkani Update news_170717": "17 JULY UPDATE_non_bold.odt",
+    # "Konkani Prime news_250717": "25 JULY PRIME_non_bold.odt",
+    # "Konkani Prime news_270717": "27 JULY PRIME_non_bold.odt",
     
-    # JUNE
-    "konkani prime news_01.0617": "1 JUNE PRIME_non_bold.odt",
-    "konkani prime news_050617": "5 JUNE PRIME_non_bold.odt",
-    "konkani update news_110617": "11 JUNE UPDATE_non_bold.odt",
-    "konkani prime news_120617": "12 JUNE PRIME_non_bold.odt",
-    "konkani prime news_190617": "19 JUNE PRIME_non_bold.odt",
-    "konkani prime news_210617": "21 JUNE PRIME_non_bold.odt",
-    "konkani prime news_220617": "22 JUNE PRIME_non_bold.odt",
-    "konkani Prime news_260617": "26 JUNE PRIME_non_bold.odt",
-    "konkani update news_260617": "26 JUNE UPDATE_non_bold.odt",
+    # JUNE - COMMENTED OUT FOR TESTING
+    # "konkani prime news_01.0617": "1 JUNE PRIME_non_bold.odt",
+    # "konkani prime news_050617": "5 JUNE PRIME_non_bold.odt",
+    # "konkani update news_110617": "11 JUNE UPDATE_non_bold.odt",
+    # "konkani prime news_120617": "12 JUNE PRIME_non_bold.odt",
+    # "konkani prime news_190617": "19 JUNE PRIME_non_bold.odt",
+    # "konkani prime news_210617": "21 JUNE PRIME_non_bold.odt",
+    # "konkani prime news_220617": "22 JUNE PRIME_non_bold.odt",
+    # "konkani Prime news_260617": "26 JUNE PRIME_non_bold.odt",
+    # "konkani update news_260617": "26 JUNE UPDATE_non_bold.odt",
     
-    # MAY
-    "Konk Prime_010517": "1 MAY PRIME_non_bold.odt",
-    "Konk Prime News_040517": "4 MAY PRIME_non_bold.odt",
-    "Konkani Prime News_080517": "8 MAY PRIME_non_bold.odt",
-    "Konk Prime News_110517": "11 MAY PRIME_non_bold.odt",
-    "Konkani Prime News_150517": "15 MAY PRIME_non_bold.odt",
-    "Konk Prime News_220517": "21 MAY PRIME_non_bold.odt",  # Note: date mismatch in mapping but using as provided
-    "konkani prime news_250517": "25 MAY PRIME_non_bold.odt",
+    # MAY - COMMENTED OUT FOR TESTING
+    # "Konk Prime_010517": "1 MAY PRIME_non_bold.odt",
+    # "Konk Prime News_040517": "4 MAY PRIME_non_bold.odt",
+    # "Konkani Prime News_080517": "8 MAY PRIME_non_bold.odt",
+    # "Konk Prime News_110517": "11 MAY PRIME_non_bold.odt",
+    # "Konkani Prime News_150517": "15 MAY PRIME_non_bold.odt",
+    # "Konk Prime News_220517": "21 MAY PRIME_non_bold.odt",  # Note: date mismatch in mapping but using as provided
+    # "konkani prime news_250517": "25 MAY PRIME_non_bold.odt",
     
-    # OCTOBER
-    "2nd Oct 17_Konk Prime News": "2 OCT PRIME_non_bold.odt",
-    "6nd Oct 17_Konk Prime News": "6 OCT PRIME_non_bold.odt",
-    "9th Oct 17_Konk Prime News": "9 OCT PRIME_non_bold.odt",
-    "12th Oct 17_Konk Prime News": "12 OCT PRIME_non_bold.odt",
-    "16th Oct 17_Konk Prime News": "16 OCT PRIME_non_bold.odt",
-    "19th Oct 17_Konk Prime News": "19 OCT PRIME_non_bold.odt",
-    "27th Oct 17_Konk Prime News": "27 OCT PRIME_non_bold.odt",
-    "30th Oct 17_Konk Prime News": "30 OCT PRIME_non_bold.odt",
+    # OCTOBER - COMMENTED OUT FOR TESTING
+    # "2nd Oct 17_Konk Prime News": "2 OCT PRIME_non_bold.odt",
+    # "6nd Oct 17_Konk Prime News": "6 OCT PRIME_non_bold.odt",
+    # "9th Oct 17_Konk Prime News": "9 OCT PRIME_non_bold.odt",
+    # "12th Oct 17_Konk Prime News": "12 OCT PRIME_non_bold.odt",
+    # "16th Oct 17_Konk Prime News": "16 OCT PRIME_non_bold.odt",
+    # "19th Oct 17_Konk Prime News": "19 OCT PRIME_non_bold.odt",
+    # "27th Oct 17_Konk Prime News": "27 OCT PRIME_non_bold.odt",
+    # "30th Oct 17_Konk Prime News": "30 OCT PRIME_non_bold.odt",
     
-    # NOVEMBER
-    "03 nov 17_Konk Prime News": "3  NOV  PRIME_non_bold.odt",
-    "06 nov 17_Konk Prime News": "6  NOV  PRIME_non_bold.odt",
-    "konkani prime 13 nov 17": "13  NOV PRIME_non_bold.odt",
-    "konkani prime 15 nov 17": "15 NOV PRIME_non_bold.odt",
-    "16th Nov 17_konkani update 17 nov_audio_only": "16 NOV PRIME_non_bold.odt",
-    "konkani prime 20 nov 17": "20 NOV PRIME_non_bold.odt",
-    "konkani prime 24 nov 17": "24  NOV PRIME_non_bold.odt",
-    "konkani prime 27 nov 17": "27  NOV PRIME_non_bold.odt",
+    # NOVEMBER - COMMENTED OUT FOR TESTING
+    # "03 nov 17_Konk Prime News": "3  NOV  PRIME_non_bold.odt",
+    # "06 nov 17_Konk Prime News": "6  NOV  PRIME_non_bold.odt",
+    # "konkani prime 13 nov 17": "13  NOV PRIME_non_bold.odt",
+    # "konkani prime 15 nov 17": "15 NOV PRIME_non_bold.odt",
+    # "16th Nov 17_konkani update 17 nov_audio_only": "16 NOV PRIME_non_bold.odt",
+    # "konkani prime 20 nov 17": "20 NOV PRIME_non_bold.odt",
+    # "konkani prime 24 nov 17": "24  NOV PRIME_non_bold.odt",
+    # "konkani prime 27 nov 17": "27  NOV PRIME_non_bold.odt",
 }
 
 # Month folder mapping
@@ -317,10 +329,27 @@ class GeminiAutomator:
     def start_browser(self):
         """Start Chrome browser and navigate to Gemini"""
         print("Starting Chrome browser...")
+        
+        # Close Chrome first to avoid conflicts
+        close_chrome_processes()
+        
         service = Service(executable_path=self.chromedriver_path)
         options = webdriver.ChromeOptions()
-        # Keep browser open for manual login
+        
+        # Use your Chrome profile for auto-login
+        automation_profile = r"C:\Users\Kavish\AppData\Local\Google\Chrome\User Data"
+        options.add_argument(f"user-data-dir={automation_profile}")
+        options.add_argument("profile-directory=Default")
+        
+        # Add flags to prevent crashes
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--remote-debugging-port=9222")
+        
+        # Keep browser open for debugging
         options.add_experimental_option("detach", True)
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
         
         self.driver = webdriver.Chrome(service=service, options=options)
         self.wait = WebDriverWait(self.driver, 30)
@@ -329,7 +358,16 @@ class GeminiAutomator:
         self.driver.get("https://gemini.google.com")
         print("Waiting for page to load...")
         time.sleep(5)  # Wait for page to fully load
-        print("Proceeding automatically...")
+        
+        print("\n" + "="*60)
+        print("SETUP TIME: You have 15 seconds to set up...")
+        print("(Login to Gemini if this is your first run)")
+        print("="*60)
+        for i in range(15, 0, -1):
+            print(f"Starting in {i} seconds...", end="\r")
+            time.sleep(1)
+        print("\nStarting automation now!")
+        print("="*60 + "\n")
     
     def find_input_element(self):
         """Find the Gemini input textarea element"""
@@ -542,36 +580,21 @@ class GeminiAutomator:
 
 def parse_gemini_response(response_text: str) -> List[Tuple[str, str]]:
     """
-    Parse Gemini response using regex to extract file_name and matched_text pairs.
-    Pattern: --- file_name, matched_text
+    Parse Gemini response to extract file_name and matched_text pairs.
+    Handles the format: --- filename ---,text
     """
     matches = []
     
-    # Use the exact regex pattern specified
-    pattern = r"---\s*(.*?)\s*,(.*)"
+    # Pattern for: --- Konkani Prime News_070817_segment_001 ---,matched_text
+    # This matches the actual format Gemini is returning
+    dash_format_pattern = r'---\s*([^\-]+?)\s*---\s*,\s*(.+?)(?=\n---|$)'
     
-    # Find all matches
-    for match in re.finditer(pattern, response_text, re.MULTILINE | re.DOTALL):
+    for match in re.finditer(dash_format_pattern, response_text, re.MULTILINE | re.DOTALL):
         file_name = match.group(1).strip()
         matched_text = match.group(2).strip()
         
-        # Clean up file_name (remove any extra dashes or whitespace)
-        file_name = re.sub(r'^---+', '', file_name).strip()
-        
         if file_name and matched_text:
             matches.append((file_name, matched_text))
-    
-    # Alternative pattern: if CSV format without dashes
-    if not matches:
-        # Try CSV format: file_name, matched_text
-        csv_pattern = r"^([^,]+?),\s*(.+)$"
-        for line in response_text.split('\n'):
-            match = re.match(csv_pattern, line.strip())
-            if match:
-                file_name = match.group(1).strip()
-                matched_text = match.group(2).strip()
-                if file_name and matched_text and not file_name.startswith('file_name'):
-                    matches.append((file_name, matched_text))
     
     return matches
 
@@ -696,6 +719,13 @@ def main():
                     continue
                 
                 print(f"Response length: {len(response)} characters")
+                
+                # DEBUG: Print first 500 chars of response
+                print("\n" + "="*60)
+                print("DEBUG - RAW RESPONSE (first 500 chars):")
+                print("="*60)
+                print(response[:500])
+                print("="*60 + "\n")
                 
                 # Parse response
                 print("Parsing response...")
