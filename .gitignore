@@ -1,0 +1,15 @@
+# Ignore cleaned transcript folders/files
+**/Cleaned_Transcript/
+**/cleaned_transcript/
+*Cleaned_Transcript*
+
+# Ignore segment transcript folders/files
+**/Segment_Transcript/
+**/segment_transcript/
+*Segment_Transcript*
+
+# Ignore training folders/files
+Training/
+training/
+**/Training/
+**/training/
