@@ -17,5 +17,31 @@ Training/
 training/
 **/Training/
 **/training/
+training_through_bot/
+**/training_through_bot/
+
+# Chrome profile data - contains browsing history and session data
+chrome_debug_profile/
 chrome_automation_profile/
 selenium_profile/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ChromeDriver
+chromedriver.exe
+chromedriver
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
